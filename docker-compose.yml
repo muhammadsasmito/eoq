@@ -1,0 +1,38 @@
+version: "3.7"
+
+services:
+  zend-app:
+    build: .
+    ports:
+      - "8080:80"
+    volumes:
+      - ./app:/var/www/site
+
+  mysql:
+    image: mariadb:10.3
+    container_name: mariadb_eoq
+    volumes:
+      - container-volume:/var/lib/mysql
+      - ./app/eoq.sql:/docker-entrypoint-initdb.d/dump.sql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+      MYSQL_DATABASE: eoq
+    ports:
+      - "3306:3306"
+
+  phpmyadmin:
+    depends_on:
+      - mysql
+    image: phpmyadmin/phpmyadmin
+    container_name: phpadmin_eoq
+    restart: always
+    ports:
+      - '8081:80'
+    environment:
+      PMA_HOST: mysql
+      MYSQL_ROOT_PASSWORD: root
+
+volumes:
+  container-volume:
